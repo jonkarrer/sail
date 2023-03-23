@@ -12,6 +12,12 @@ impl Request {
         let r = format!("{} {} HTTP/1.1\r\nHost: {}\r\n\r\n", &self.method, &self.resource_path, &self.host);
         return r;
     }
+    fn make_stream_connection(&self) -> Result<TcpStream, std::io::Error> {
+        let host = "127.0.0.1";
+        let port = 8080;
+        let address = format!("{}:{}", host, port);
+        return TcpStream::connect(address);
+    }
 }
 
 fn main() {
@@ -20,11 +26,8 @@ fn main() {
         resource_path: String::from("/api"),
         host: String::from("localhost")
     };
-    
-    let host = "127.0.0.1";
-    let port = 80;
-    let address = format!("{}:{}", host, 8080);
-    let mut stream = TcpStream::connect(address).unwrap();
+   
+    let mut stream = req.make_stream_connection().unwrap();
     stream.write_all(req.build().as_bytes()).unwrap(); 
     let mut buffer = [0;1024];
 
