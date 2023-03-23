@@ -1,5 +1,5 @@
 use std::io::{Read,Write};
-use std::net::TcpStream;
+use std::net::{TcpStream, SocketAddr, ToSocketAddrs};
 
 struct Request {
     method: String,
@@ -13,14 +13,19 @@ impl Request {
         return r;
     }
 }
+
 fn main() {
     let req = Request {
         method: String::from("GET"),
         resource_path: String::from("/api"),
         host: String::from("localhost")
     };
-    let mut stream = TcpStream::connect("127.0.0.1:8080").unwrap();
-    stream.write_all(req.build().as_bytes()); 
+    
+    let host = "127.0.0.1";
+    let port = 80;
+    let address = format!("{}:{}", host, 8080);
+    let mut stream = TcpStream::connect(address).unwrap();
+    stream.write_all(req.build().as_bytes()).unwrap(); 
     let mut buffer = [0;1024];
 
     loop {
