@@ -1,10 +1,26 @@
 use std::io::{Read,Write};
 use std::net::TcpStream;
 
+struct Request {
+    method: String,
+    resource_path: String,
+    host: String
+}
+
+impl Request {
+    fn build(&self) -> String {
+        let r = format!("{} {} HTTP/1.1\r\nHost: {}\r\n\r\n", &self.method, &self.resource_path, &self.host);
+        return r;
+    }
+}
 fn main() {
-    let mut stream = TcpStream::connect("www.google.com:80").unwrap();
-    let request = b"GET / HTTP/1.1\r\nHost: www.google.com\r\n\r\n";
-    stream.write_all(request); 
+    let req = Request {
+        method: String::from("GET"),
+        resource_path: String::from("/api"),
+        host: String::from("localhost")
+    };
+    let mut stream = TcpStream::connect("127.0.0.1:8080").unwrap();
+    stream.write_all(req.build().as_bytes()); 
     let mut buffer = [0;1024];
 
     loop {
