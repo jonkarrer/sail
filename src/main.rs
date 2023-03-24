@@ -2,7 +2,6 @@ use std::io::{Read, Write, Error, ErrorKind, Result};
 use std::net::{TcpStream, SocketAddr, ToSocketAddrs};
 use std::time::Duration;
 
-
 struct Request {
     method: String,
     resource_path: String,
@@ -43,7 +42,7 @@ fn main() -> Result<()> {
    
     let mut stream = req.make_stream_connection().unwrap();
     stream.write_all(req.prepare_http().as_bytes()).unwrap(); 
-    let mut buffer = [0;1024];
+    let mut buffer = [0;2096];
     let mut response = String::new();
 
     stream.set_read_timeout(Some(Duration::from_millis(300)));
