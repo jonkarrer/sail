@@ -1,4 +1,4 @@
-use std::io::{Read, Write, Error, ErrorKind, Result};
+use std::io::{Read, Write, Error, ErrorKind, Result, BufReader, BufRead};
 use std::net::{TcpStream, SocketAddr, ToSocketAddrs};
 use std::time::Duration;
 
@@ -39,17 +39,20 @@ fn main() -> Result<()> {
         host: String::from("www.google.com"),
         port: 80
     };
-   
+  
+    // Connect to stream and send request
     let mut stream = req.make_stream_connection().unwrap();
     stream.write_all(req.prepare_http().as_bytes()).unwrap(); 
-    let mut buffer = [0;2096];
+    
+    // Init buf
+    let mut buf_reader = BufReader::new(&stream);
+    let mut temp_buf_storage: Vec<u8> = Vec::new();
+
+    // Config response
+    stream.set_read_timeout(Some(Duration::from_millis(300)));
     let mut response = String::new();
 
-    stream.set_read_timeout(Some(Duration::from_millis(300)));
-    
-    let mut i = 0;
     loop {
-        i+=1;
         println!("KiloBytes {}", i);
         match stream.read(&mut buffer) {
             Ok(0) => break,
