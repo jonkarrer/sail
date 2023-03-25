@@ -1,5 +1,5 @@
-use std::io::{Read, Write, Error, ErrorKind, Result, BufReader, BufRead};
-use std::net::{TcpStream, SocketAddr, ToSocketAddrs};
+use std::io::{Write, Error, ErrorKind, Result, BufReader, BufRead};
+use std::net::{TcpStream, ToSocketAddrs};
 use std::time::Duration;
 
 struct Request {
@@ -31,6 +31,19 @@ impl Request {
     }
 }
 
+#[derive(Debug)]
+struct Headers {
+    response_status: String,
+    content_type: String,
+    transfer_encoding: bool,
+    content_length: String
+}
+
+struct Response {
+    headers: Headers,
+    body: String
+}
+
 fn main() -> Result<()> {
     let req = Request {
         method: String::from("GET"),
@@ -53,18 +66,33 @@ fn main() -> Result<()> {
     let mut headers = String::new();
     let mut response = String::new();
 
+    // Get res status
+    buf_reader.read_line(&mut temp_buf_storage)?;
+    let response_status = String::from(&temp_buf_storage);
+
     // Read headers
+    let mut content_type = String::new();
+    let mut transfer_encoding = false;
+    let mut content_length = String::new();
     loop {
         temp_buf_storage.clear();
         buf_reader.read_line(&mut temp_buf_storage)?;
 
-        if temp_buf_storage == "\r\n" {
-            break
-        } else {
-            headers.push_str(&temp_buf_storage);
+        match temp_buf_storage.as_str() {
+            "\r\n" => break,
+            "Transfer-Encoding: chunked" => transfer_encoding = true,
+            "Content-Type" => content_type.push_str(&temp_buf_storage),
+            "Content-Length" => content_length.push_str(&temp_buf_storage),
+            _ => headers.push_str(&temp_buf_storage)
         }
 
     }
-    println!("{}", headers);
+    let head = Headers {
+        response_status: response_status,
+        content_type: content_type,
+        transfer_encoding: transfer_encoding,
+        content_length: content_length
+    };
+    println!("{:?}", head);
     Ok(())
 }
