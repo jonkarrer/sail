@@ -36,7 +36,8 @@ struct Headers {
     response_status: String,
     content_type: String,
     transfer_encoding: bool,
-    content_length: String
+    content_length: String,
+    raw_data: String
 }
 
 struct Response {
@@ -63,17 +64,23 @@ fn main() -> Result<()> {
 
     // Config response
     stream.set_read_timeout(Some(Duration::from_millis(300)));
-    let mut headers = String::new();
+    let mut misc = String::new();
     let mut response = String::new();
 
     // Get res status
     buf_reader.read_line(&mut temp_buf_storage)?;
-    let response_status = String::from(&temp_buf_storage);
+    let mut response_status = String::new();
+    response_status.push_str(&temp_buf_storage.trim_end_matches("\r\n"));
 
-    // Read headers
-    let mut content_type = String::new();
-    let mut transfer_encoding = false;
-    let mut content_length = String::new();
+    let mut headers = Headers {
+        response_status: response_status,
+        content_type: String::new(),
+        transfer_encoding: false,
+        content_length: String::new(),
+        raw_data: String::new()
+    };
+
+    // Read lines in header
     loop {
         temp_buf_storage.clear();
         buf_reader.read_line(&mut temp_buf_storage)?;
@@ -82,28 +89,23 @@ fn main() -> Result<()> {
         let line = temp_buf_storage.to_ascii_lowercase();
         
         if line.starts_with("transfer-encoding:") {
-            transfer_encoding = true;
+            headers.transfer_encoding = true;
         };
 
         if line.starts_with("content-type:") {
-            content_type.push_str(&temp_buf_storage);
+            headers.content_type.push_str(&temp_buf_storage.trim_end_matches("\r\n"));
         };
 
         if line.starts_with("content-length") {
-            content_length.push_str(&temp_buf_storage);
+            headers.content_length.push_str(&temp_buf_storage.trim_end_matches("\r\n"));
         };
         
         if temp_buf_storage == "\r\n" {break};
         
-        headers.push_str(&temp_buf_storage);
+        headers.raw_data.push_str(&temp_buf_storage.trim());
 
     }
-    let head = Headers {
-        response_status: response_status,
-        content_type: content_type,
-        transfer_encoding: transfer_encoding,
-        content_length: content_length
-    };
-    println!("{:?}", head);
+    
+    println!("{:?}", headers);
     Ok(())
 }
