@@ -77,14 +77,23 @@ fn main() -> Result<()> {
     loop {
         temp_buf_storage.clear();
         buf_reader.read_line(&mut temp_buf_storage)?;
+   
 
-        match temp_buf_storage.as_str() {
-            "\r\n" => break,
-            "Transfer-Encoding: chunked" => transfer_encoding = true,
-            "Content-Type" => content_type.push_str(&temp_buf_storage),
-            "Content-Length" => content_length.push_str(&temp_buf_storage),
-            _ => headers.push_str(&temp_buf_storage)
-        }
+        let line = temp_buf_storage.to_ascii_lowercase();
+        
+        if line.starts_with("transfer-encoding:") {
+            transfer_encoding = true;
+        };
+        if line.starts_with("content-type:") {
+            content_type.push_str(&temp_buf_storage);
+        };
+        if line.starts_with("content-length") {
+            content_length.push_str(&temp_buf_storage);
+        };
+        
+        if temp_buf_storage == "\r\n" {break};
+        
+        headers.push_str(&temp_buf_storage);
 
     }
     let head = Headers {
