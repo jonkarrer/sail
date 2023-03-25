@@ -46,20 +46,25 @@ fn main() -> Result<()> {
     
     // Init buf
     let mut buf_reader = BufReader::new(&stream);
-    let mut temp_buf_storage: Vec<u8> = Vec::new();
+    let mut temp_buf_storage = String::new();
 
     // Config response
     stream.set_read_timeout(Some(Duration::from_millis(300)));
+    let mut headers = String::new();
     let mut response = String::new();
 
+    // Read headers
     loop {
-        println!("KiloBytes {}", i);
-        match stream.read(&mut buffer) {
-            Ok(0) => break,
-            Ok(bytes_read) => response.push_str(&String::from_utf8_lossy(&buffer[..bytes_read])),
-            Err(_) => break
+        temp_buf_storage.clear();
+        buf_reader.read_line(&mut temp_buf_storage)?;
+
+        if temp_buf_storage == "\r\n" {
+            break
+        } else {
+            headers.push_str(&temp_buf_storage);
         }
+
     }
-    println!("{}", response);
+    println!("{}", headers);
     Ok(())
 }
