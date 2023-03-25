@@ -84,9 +84,11 @@ fn main() -> Result<()> {
         if line.starts_with("transfer-encoding:") {
             transfer_encoding = true;
         };
+
         if line.starts_with("content-type:") {
             content_type.push_str(&temp_buf_storage);
         };
+
         if line.starts_with("content-length") {
             content_length.push_str(&temp_buf_storage);
         };
