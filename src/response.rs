@@ -1,13 +1,14 @@
 extern crate native_tls;
 
-use native_tls::{TlsConnector, TlsStream};
-use std::io::{BufReader, BufRead, Read};
+use native_tls::{TlsStream};
+use std::io::{BufReader, BufRead};
 use std::net::{TcpStream};
 
 #[derive(Debug)]
 pub struct Header {
     response_status: String,
     content_type: String,
+    raw: String
 }
 
 #[derive(Debug)]
@@ -23,6 +24,7 @@ pub fn parse_response(mut stream: TlsStream<TcpStream>) -> Response {
     let mut header = Header {
         response_status: String::new(),
         content_type: String::new(),
+        raw: String::new()
     };
     
     // Response Status Code
@@ -32,16 +34,22 @@ pub fn parse_response(mut stream: TlsStream<TcpStream>) -> Response {
     // Read lines in header
     loop {
         buf.clear();
-        buf_reader.read_line(&mut buf).unwrap();
+        match buf_reader.read_line(&mut buf) {
+            Ok(0) => break,
+            Ok(_) => {
+                if buf == "\r\n" {
+                    buf.clear();
+                    break
+                };
+                let line = buf.to_ascii_lowercase();
+                if line.starts_with("content-type:") {
+                    header.content_type.push_str(&buf.trim_end_matches("\r\n"));
+                };
+                header.raw.push_str(&buf.trim_end_matches("\r\n"));
+            },
+            Err(_) => println!("Failed to read header line")
+        }
    
-        let line = buf.to_ascii_lowercase();
-        if line.starts_with("content-type:") {
-            header.content_type.push_str(&buf.trim_end_matches("\r\n"));
-        };
-        if buf == "\r\n" {
-            buf.clear();
-            break
-        };
     }
   
     let mut response = Response {

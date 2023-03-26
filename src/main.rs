@@ -1,5 +1,4 @@
 use std::io::{Write, Result};
-use std::time::Duration;
 
 mod response;
 mod request;
