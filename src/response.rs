@@ -1,3 +1,6 @@
+extern crate native_tls;
+
+use native_tls::{TlsConnector, TlsStream};
 use std::io::{BufReader, BufRead, Read};
 use std::net::{TcpStream};
 
@@ -13,8 +16,8 @@ pub struct Response {
     body: String
 }
 
-pub fn parse_response(stream: TcpStream) -> Response {
-    let mut buf_reader = BufReader::new(&stream);
+pub fn parse_response(mut stream: TlsStream<TcpStream>) -> Response {
+    let mut buf_reader = BufReader::new(&mut stream);
     let mut buf = String::new();
    
     let mut header = Header {
