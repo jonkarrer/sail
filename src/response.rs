@@ -71,7 +71,7 @@ pub fn parse_response(mut stream: TlsStream<TcpStream>) -> Response {
                 };
                 response.body.push_str(&buf.trim());
             }
-            Err(_) => println!("Failed to read body line"),
+            Err(_) => break,
         };
         if &buf == "" {
             break;
