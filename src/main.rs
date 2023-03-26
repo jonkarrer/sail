@@ -6,6 +6,7 @@ mod request;
 use request::Request;
 
 fn main() -> Result<()> {
+    //TODO Get request from CLI
     let req = Request {
         method: String::from("GET"),
         resource_path: String::from("/"),
@@ -18,9 +19,9 @@ fn main() -> Result<()> {
     let mut stream = req.make_stream_connection().unwrap();
     stream.set_read_timeout(Some(Duration::from_millis(300))).unwrap();
     stream.write_all(req.prepare_http().as_bytes()).unwrap(); 
-    
 
-    let headers = header::parse_header(stream); 
+    let headers = header::parse_header(stream);
     println!("{:?}", headers);
+    //TODO parse body
     Ok(())
 }
