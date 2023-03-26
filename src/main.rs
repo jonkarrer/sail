@@ -1,6 +1,7 @@
 use std::io::{Write, Error, ErrorKind, Result, BufReader, BufRead};
 use std::net::{TcpStream, ToSocketAddrs};
 use std::time::Duration;
+mod header;
 
 struct Request {
     method: String,
@@ -31,19 +32,7 @@ impl Request {
     }
 }
 
-#[derive(Debug)]
-struct Headers {
-    response_status: String,
-    content_type: String,
-    transfer_encoding: bool,
-    content_length: String,
-    raw_data: String
-}
 
-struct Response {
-    headers: Headers,
-    body: String
-}
 
 fn main() -> Result<()> {
     let req = Request {
@@ -58,54 +47,10 @@ fn main() -> Result<()> {
     let mut stream = req.make_stream_connection().unwrap();
     stream.write_all(req.prepare_http().as_bytes()).unwrap(); 
     
-    // Init buf
-    let mut buf_reader = BufReader::new(&stream);
-    let mut temp_buf_storage = String::new();
-
     // Config response
     stream.set_read_timeout(Some(Duration::from_millis(300)));
-    let mut misc = String::new();
-    let mut response = String::new();
 
-    // Get res status
-    buf_reader.read_line(&mut temp_buf_storage)?;
-    let mut response_status = String::new();
-    response_status.push_str(&temp_buf_storage.trim_end_matches("\r\n"));
-
-    let mut headers = Headers {
-        response_status: response_status,
-        content_type: String::new(),
-        transfer_encoding: false,
-        content_length: String::new(),
-        raw_data: String::new()
-    };
-
-    // Read lines in header
-    loop {
-        temp_buf_storage.clear();
-        buf_reader.read_line(&mut temp_buf_storage)?;
-   
-
-        let line = temp_buf_storage.to_ascii_lowercase();
-        
-        if line.starts_with("transfer-encoding:") {
-            headers.transfer_encoding = true;
-        };
-
-        if line.starts_with("content-type:") {
-            headers.content_type.push_str(&temp_buf_storage.trim_end_matches("\r\n"));
-        };
-
-        if line.starts_with("content-length") {
-            headers.content_length.push_str(&temp_buf_storage.trim_end_matches("\r\n"));
-        };
-        
-        if temp_buf_storage == "\r\n" {break};
-        
-        headers.raw_data.push_str(&temp_buf_storage.trim());
-
-    }
-    
+    let headers = header::parse_header(stream); 
     println!("{:?}", headers);
     Ok(())
 }
