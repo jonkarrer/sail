@@ -1,4 +1,4 @@
-use std::io::{Write, Error, ErrorKind, Result, BufReader, BufRead};
+use std::io::{Write, Error, ErrorKind, Result};
 use std::net::{TcpStream, ToSocketAddrs};
 use std::time::Duration;
 mod header;
@@ -21,7 +21,7 @@ impl Request {
         let possible_ip_addresses = address.to_socket_addrs().unwrap();
         
         for addr in possible_ip_addresses {
-            let ok_connection = match TcpStream::connect_timeout(&addr, Duration::new(2, 0)) {
+            match TcpStream::connect_timeout(&addr, Duration::new(2, 0)) {
                 Ok(stream) => return Ok(stream),
                 Err(_e) => {
                     continue

@@ -1,5 +1,5 @@
 use std::io::{BufReader, BufRead};
-use std::net::{TcpStream, ToSocketAddrs};
+use std::net::{TcpStream};
 
 #[derive(Debug)]
 pub struct Header {
@@ -13,18 +13,18 @@ pub struct Header {
 pub fn parse_header(stream: TcpStream) -> Header {
     let mut buf_reader = BufReader::new(&stream);
     let mut buf = String::new();
-    
-    buf_reader.read_line(&mut buf).unwrap();
-    let mut response_status = String::new();
-    response_status.push_str(&buf.trim_end_matches("\r\n"));
-
-    let mut headers = Header {
-        response_status: response_status,
+   
+    let mut header = Header {
+        response_status: String::new(),
         content_type: String::new(),
         transfer_encoding: false,
         content_length: String::new(),
         raw_data: String::new()
     };
+    
+    // Response Status Code
+    buf_reader.read_line(&mut buf).unwrap();
+    header.response_status.push_str(&buf.trim_end_matches("\r\n"));
 
     // Read lines in header
     loop {
@@ -34,21 +34,21 @@ pub fn parse_header(stream: TcpStream) -> Header {
         let line = buf.to_ascii_lowercase();
         
         if line.starts_with("transfer-encoding:") {
-            headers.transfer_encoding = true;
+            header.transfer_encoding = true;
         };
 
         if line.starts_with("content-type:") {
-            headers.content_type.push_str(&buf.trim_end_matches("\r\n"));
+            header.content_type.push_str(&buf.trim_end_matches("\r\n"));
         };
 
         if line.starts_with("content-length") {
-            headers.content_length.push_str(&buf.trim_end_matches("\r\n"));
+            header.content_length.push_str(&buf.trim_end_matches("\r\n"));
         };
         
         if buf == "\r\n" {break};
         
-        headers.raw_data.push_str(&buf.trim());
+        header.raw_data.push_str(&buf.trim());
     }
-    return headers;
+    return header;
 }
 
