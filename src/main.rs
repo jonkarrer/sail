@@ -10,9 +10,9 @@ fn main() -> Result<()> {
     // TODO Make a parser for input of http string
     let req = Request {
         method: String::from("GET"),
-        resource_path: String::from("/"),
-        query_params: String::from("?param1=value"),
-        host: String::from("www.google.com"),
+        resource_path: String::from("/test"),
+        query_params: String::new(),
+        host: String::from("www.dummyjson.com"),
         port: 80
     };
   
@@ -23,6 +23,5 @@ fn main() -> Result<()> {
 
     let res = response::parse_response(stream);
     println!("{:?}", res);
-    //TODO parse body
     Ok(())
 }
