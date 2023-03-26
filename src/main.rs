@@ -1,12 +1,13 @@
 use std::io::{Write, Result};
 use std::time::Duration;
 
-mod header;
+mod response;
 mod request;
 use request::Request;
 
 fn main() -> Result<()> {
     //TODO Get request from CLI
+    // TODO Make a parser for input of http string
     let req = Request {
         method: String::from("GET"),
         resource_path: String::from("/"),
@@ -20,8 +21,8 @@ fn main() -> Result<()> {
     stream.set_read_timeout(Some(Duration::from_millis(300))).unwrap();
     stream.write_all(req.prepare_http().as_bytes()).unwrap(); 
 
-    let headers = header::parse_header(stream);
-    println!("{:?}", headers);
+    let res = response::parse_response(stream);
+    println!("{:?}", res);
     //TODO parse body
     Ok(())
 }
