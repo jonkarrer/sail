@@ -1,7 +1,7 @@
-use std::io::{Write, Result};
+use std::io::{Result, Write};
 
-mod response;
 mod request;
+mod response;
 use request::Request;
 
 fn main() -> Result<()> {
@@ -12,12 +12,12 @@ fn main() -> Result<()> {
         resource_path: String::from("/products"),
         query_params: String::new(),
         host: String::from("www.dummyjson.com"),
-        port: 443
+        port: 443,
     };
-  
+
     // Connect to stream and send request
     let mut stream = req.make_stream_connection().unwrap();
-    stream.write_all(req.prepare_http().as_bytes()).unwrap(); 
+    stream.write_all(req.prepare_http().as_bytes()).unwrap();
 
     let res = response::parse_response(stream);
     println!("{:?}", res);
