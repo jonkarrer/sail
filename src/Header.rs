@@ -32,7 +32,7 @@ pub fn parse_header(stream: TcpStream) -> Header {
         buf_reader.read_line(&mut buf).unwrap();
    
         let line = buf.to_ascii_lowercase();
-        
+        //TODO clean this loop up
         if line.starts_with("transfer-encoding:") {
             header.transfer_encoding = true;
         };
@@ -41,7 +41,9 @@ pub fn parse_header(stream: TcpStream) -> Header {
             header.content_type.push_str(&buf.trim_end_matches("\r\n"));
         };
 
-        if line.starts_with("content-length") {
+        if line.starts_with("content-length:") {
+            //TODO Regex for length
+            //TODO Convert string to number
             header.content_length.push_str(&buf.trim_end_matches("\r\n"));
         };
         
