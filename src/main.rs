@@ -1,10 +1,10 @@
-use std::io::{Result, Write};
+use std::io::Write;
 
 mod request;
 mod response;
 use request::Request;
 
-fn main() -> Result<()> {
+fn main() {
     //TODO Get request from CLI
     // TODO Make a parser for input of http string
     let req = Request {
@@ -21,5 +21,4 @@ fn main() -> Result<()> {
 
     let res = response::parse_response(stream);
     println!("{:?}", res);
-    Ok(())
 }
