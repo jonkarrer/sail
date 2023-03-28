@@ -21,6 +21,13 @@ fn main() {
 
     let res = response::parse_response(stream);
 
+    let mut res_bytes = res.body.into_bytes();
+
+    while res_bytes[0] != 123 {
+       res_bytes.remove(0); 
+    }
+
+    
     println!("{:?}", res.header);
-    println!("{:?}", res.body.as_bytes());
+    println!("{:?}", res_bytes);
 }
