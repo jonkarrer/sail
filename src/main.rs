@@ -20,5 +20,7 @@ fn main() {
     stream.write_all(req.prepare_http().as_bytes()).unwrap();
 
     let res = response::parse_response(stream);
-    println!("{:?}", res);
+
+    println!("{:?}", res.header);
+    println!("{:?}", res.body.as_bytes());
 }

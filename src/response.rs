@@ -13,8 +13,8 @@ pub struct Header {
 
 #[derive(Debug)]
 pub struct Response {
-    header: Header,
-    body: String,
+    pub header: Header,
+    pub body: String,
 }
 
 pub fn parse_response(mut stream: TlsStream<TcpStream>) -> Response {
