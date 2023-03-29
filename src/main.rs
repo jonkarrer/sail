@@ -27,7 +27,11 @@ fn main() {
        res_bytes.remove(0); 
     }
 
-    
+    while res_bytes[res_bytes.len() - 1] != 125 {
+        res_bytes.remove(res_bytes.len() - 1);
+    }
+
+    let new_string = String::from_utf8(res_bytes).unwrap(); 
     println!("{:?}", res.header);
-    println!("{:?}", res_bytes);
+    println!("{}", new_string);
 }
