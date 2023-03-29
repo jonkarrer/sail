@@ -31,6 +31,14 @@ fn main() {
         res_bytes.remove(res_bytes.len() - 1);
     }
 
+    let divisions = (res_bytes.len() / 80) - 1;
+    let mut i = 80;
+
+    while i < divisions * 80 {
+        res_bytes.insert(i, 10);
+        i+=80;
+    } 
+
     let new_string = String::from_utf8(res_bytes).unwrap(); 
     println!("{:?}", res.header);
     println!("{}", new_string);
