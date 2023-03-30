@@ -1,17 +1,16 @@
-use std::io::Write;
 use std::env;
+use std::io::Write;
 mod request;
 mod response;
 use request::Request;
 
 fn main() {
-
     let cli_args: Vec<String> = env::args().collect();
 
     let request_address = &cli_args[1];
 
     println!("{}", request_address);
-    
+
     // Parse
     let req = Request {
         method: String::from("GET"),
@@ -25,5 +24,5 @@ fn main() {
     let mut stream = req.make_stream_connection().unwrap();
     stream.write_all(req.prepare_http().as_bytes()).unwrap();
 
-    let res = response::parse_response(stream);
+    response::parse_response(stream);
 }
