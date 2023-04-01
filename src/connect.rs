@@ -1,6 +1,6 @@
 extern crate native_tls;
 
-use native_tls::{TlsConnector, TlsStream};
+use self::native_tls::{TlsConnector, TlsStream};
 use std::io::{Error, ErrorKind, Result};
 use std::net::{TcpStream, ToSocketAddrs};
 use std::time::Duration;
