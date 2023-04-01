@@ -28,7 +28,7 @@ pub fn parse_response(mut stream: TlsStream<TcpStream>) -> Response {
     };
 
     // Response Status Code
-    buf_reader.read_line(&mut buf).unwrap();
+    buf_reader.read_line(&mut buf).expect("Failed To Read Buffer Line");
     header
         .response_status
         .push_str(&buf.trim_end_matches("\r\n"));
