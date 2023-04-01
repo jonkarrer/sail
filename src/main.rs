@@ -2,6 +2,7 @@ use std::io::Write;
 
 mod request;
 mod response;
+mod connect;
 use request::Request;
 
 fn main() {
@@ -16,8 +17,8 @@ fn main() {
     };
 
     // Connect to stream and send request
-    let mut stream = req.make_stream_connection().unwrap();
-    stream.write_all(req.prepare_http().as_bytes()).unwrap();
+    let mut stream = connect::make_stream_connection(&req.host, &req.port).unwrap();
+    stream.write_all(req.http().as_bytes()).unwrap();
 
     let res = response::parse_response(stream);
 
