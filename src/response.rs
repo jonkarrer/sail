@@ -47,7 +47,7 @@ pub fn parse_response(mut stream: TlsStream<TcpStream>) -> Response {
                 if line.starts_with("content-type:") {
                     header.content_type.push_str(&buf.trim_end_matches("\r\n"));
                 };
-                println!("{}",&buf.trim_end_matches("\r\n"));
+                println!("{}", &buf.trim_end_matches("\r\n"));
             }
             Err(_) => println!("Failed to read header line"),
         }

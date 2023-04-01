@@ -1,4 +1,3 @@
-
 pub struct Request {
     pub method: String,
     pub resource_path: String,
@@ -8,10 +7,10 @@ pub struct Request {
 }
 
 impl Request {
-  pub fn http(&self) -> String {
-      return format!(
-          "{} {}{} HTTP/1.1\r\nHost: {}\r\n\r\n",
-          &self.method, &self.resource_path, &self.query_params, &self.host
-      );
-  }
+    pub fn http(&self) -> String {
+        return format!(
+            "{} {}{} HTTP/1.1\r\nHost: {}\r\n\r\n",
+            &self.method, &self.resource_path, &self.query_params, &self.host
+        );
+    }
 }

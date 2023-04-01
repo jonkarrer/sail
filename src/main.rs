@@ -1,13 +1,11 @@
-use std::io::Write;
-
+mod connect;
 mod request;
 mod response;
-mod connect;
+
 use request::Request;
+use std::io::Write;
 
 fn main() {
-    //TODO Get request from CLI
-    // TODO Make a parser for input of http string
     let req = Request {
         method: String::from("GET"),
         resource_path: String::from("/products"),
@@ -22,6 +20,5 @@ fn main() {
 
     let res = response::parse_response(stream);
 
-  
     println!("{}", res.body);
 }
