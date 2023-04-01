@@ -1,17 +1,12 @@
-use std::env;
 use std::io::Write;
+
 mod request;
 mod response;
 use request::Request;
 
 fn main() {
-    let cli_args: Vec<String> = env::args().collect();
-
-    let request_address = &cli_args[1];
-
-    println!("{}", request_address);
-
-    // Parse
+    //TODO Get request from CLI
+    // TODO Make a parser for input of http string
     let req = Request {
         method: String::from("GET"),
         resource_path: String::from("/products"),
@@ -24,5 +19,8 @@ fn main() {
     let mut stream = req.make_stream_connection().unwrap();
     stream.write_all(req.prepare_http().as_bytes()).unwrap();
 
-    response::parse_response(stream);
+    let res = response::parse_response(stream);
+
+  
+    println!("{}", res.body);
 }
