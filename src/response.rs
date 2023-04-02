@@ -28,7 +28,9 @@ pub fn parse_response(mut stream: TlsStream<TcpStream>) -> Response {
     };
 
     // Response Status Code
-    buf_reader.read_line(&mut buf).expect("Failed To Read Buffer Line");
+    buf_reader
+        .read_line(&mut buf)
+        .expect("Failed To Read Buffer Line");
     header
         .response_status
         .push_str(&buf.trim_end_matches("\r\n"));
@@ -53,23 +55,19 @@ pub fn parse_response(mut stream: TlsStream<TcpStream>) -> Response {
         }
     }
 
-    let mut response = Response {
-        header: header,
-        body: String::new(),
-    };
-
+    let mut body_stream = String::new();
     loop {
         buf.clear();
         match buf_reader.read_line(&mut buf) {
             Ok(0) => {
-                response.body.push_str(&buf.trim());
+                body_stream.push_str(&buf.trim());
                 break;
             }
             Ok(_) => {
                 if &buf == "" {
                     break;
                 };
-                response.body.push_str(&buf.trim());
+                body_stream.push_str(&buf.trim());
             }
             Err(_) => break,
         };
@@ -78,5 +76,19 @@ pub fn parse_response(mut stream: TlsStream<TcpStream>) -> Response {
         };
     }
 
-    return response;
+    // Clean up JSON string. Remove size integers before and after { }
+    let mut res_bytes = body_stream.into_bytes();
+
+    while res_bytes[0] != 123 {
+        res_bytes.remove(0);
+    }
+
+    while res_bytes[res_bytes.len() - 1] != 125 {
+        res_bytes.remove(res_bytes.len() - 1);
+    }
+
+    Response {
+        header: header,
+        body: String::from_utf8(res_bytes).unwrap(),
+    }
 }

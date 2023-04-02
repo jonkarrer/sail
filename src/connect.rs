@@ -16,7 +16,9 @@ pub fn make_stream_connection(host: &str, port: &i16) -> Result<TlsStream<TcpStr
                 stream
                     .set_read_timeout(Some(Duration::from_millis(300)))
                     .expect("Stream Timeout Failed");
-                let secure_stream = connector.connect(&host, stream).expect("Secure Stream Failed");
+                let secure_stream = connector
+                    .connect(&host, stream)
+                    .expect("Secure Stream Failed");
                 return Ok(secure_stream);
             }
             Err(_e) => continue,
