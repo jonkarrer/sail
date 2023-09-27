@@ -1,6 +1,7 @@
 [package]
 name = "sail"
 version = "0.1.0"
+edition = "2021"
 authors = ["Jokar <karrerjon@gmail.com>"]
 description = "Super minimal http lib"
 license = "MIT"
